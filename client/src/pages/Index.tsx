@@ -7,8 +7,10 @@ import Specifications from '@/components/Specifications';
 import BikeParts from '@/components/BikeParts';
 import Gear from '@/components/Gear';
 import About from '@/components/About';
+import BrandCarousel from '@/components/BrandCarousel';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
+import HomeGearSection from '@/components/HomeGearSection';
 import { brands } from '@/data/motorcycles';
 import { ArrowRight, Bike } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -17,7 +19,7 @@ import { motion } from 'framer-motion';
 
 const Index = () => {
   const { setCurrentBrand } = useBrand();
-  
+
   // Reset brand on home page
   useEffect(() => {
     setCurrentBrand(null);
@@ -50,10 +52,12 @@ const Index = () => {
     <div className="min-h-screen overflow-x-hidden">
       <Navbar />
       <Hero />
-      <Specifications />
-      
+      {/* <BrandCarousel /> */}
+      {/* <About /> */}
+      {/* <Specifications /> */}
+
       {/* Brands Showcase Section */}
-      <motion.section 
+      <motion.section
         className="py-20 bg-gray-50"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -64,7 +68,7 @@ const Index = () => {
             <div className="flex justify-center mb-4">
               <Bike className="h-12 w-12 text-purple-600" />
             </div>
-            <motion.h2 
+            <motion.h2
               className="text-3xl md:text-4xl font-bold mb-4"
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
@@ -72,7 +76,7 @@ const Index = () => {
             >
               Premium SuperBike Brands
             </motion.h2>
-            <motion.p 
+            <motion.p
               className="text-muted-foreground max-w-2xl mx-auto"
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
@@ -81,7 +85,7 @@ const Index = () => {
               Explore our extensive collection of motorcycles from world-renowned manufacturers.
             </motion.p>
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-10">
             {brands.slice(0, 8).map((brand, index) => (
               <motion.div
@@ -96,9 +100,9 @@ const Index = () => {
                   style={{ borderTop: `3px solid ${brand.primaryColor}` }}
                 >
                   <div className="w-24 h-24 flex items-center justify-center">
-                    <img 
-                      src={brand.logo} 
-                      alt={brand.name} 
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
                       className="max-w-full max-h-full object-contain"
                     />
                   </div>
@@ -106,9 +110,9 @@ const Index = () => {
                     {brand.name}
                   </h3>
                   <div className="mt-2 h-20 w-full overflow-hidden rounded-md">
-                    <img 
-                      src={`https://source.unsplash.com/featured/?motorcycle,${brand.name}`} 
-                      alt={`${brand.name} motorcycle`} 
+                    <img
+                      src={`https://source.unsplash.com/featured/?motorcycle,${brand.name}`}
+                      alt={`${brand.name} motorcycle`}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -116,9 +120,9 @@ const Index = () => {
               </motion.div>
             ))}
           </div>
-          
+
           <div className="text-center">
-            <Button 
+            <Button
               asChild
               className="bg-purple-600 hover:bg-purple-700 text-white"
             >
@@ -130,10 +134,11 @@ const Index = () => {
           </div>
         </div>
       </motion.section>
-      
+
+      {/* Add the new HomeGearSection component above BikeParts */}
+      <HomeGearSection />
       <BikeParts />
-      <Gear />
-      <About />
+      {/* <Gear /> */}
       <Contact />
       <Footer />
     </div>

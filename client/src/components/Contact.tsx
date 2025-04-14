@@ -10,23 +10,23 @@ const Contact = () => {
     message: '',
     interest: 'test-ride'
   });
-  
+
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormStatus('submitting');
-    
+
     // Simulate form submission
     setTimeout(() => {
       console.log('Form submitted:', formData);
       setFormStatus('success');
-      
+
       // Reset form after 3 seconds
       setTimeout(() => {
         setFormStatus('idle');
@@ -44,7 +44,7 @@ const Contact = () => {
   return (
     <section id="contact" className="section py-24 relative">
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white to-kawasaki-gray"></div>
-      
+
       {/* Section Title */}
       <div className="text-center max-w-3xl mx-auto mb-16">
         <h2 className="section-title">Get in Touch</h2>
@@ -52,7 +52,7 @@ const Contact = () => {
           Have questions about the Kawasaki Ninja? Schedule a test ride or reach out to our team for more information.
         </p>
       </div>
-      
+
       {/* Contact Content */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
         {/* Form Side */}
@@ -70,12 +70,12 @@ const Contact = () => {
                   required
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-kawasaki-green focus:border-transparent"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-bg-purple-800 focus:border-transparent"
                   placeholder="John Doe"
                   disabled={formStatus === 'submitting' || formStatus === 'success'}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <label htmlFor="email" className="block text-sm font-medium">
                   Email Address
@@ -87,13 +87,13 @@ const Contact = () => {
                   required
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-kawasaki-green focus:border-transparent"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-bg-purple-600 focus:border-transparent"
                   placeholder="john@example.com"
                   disabled={formStatus === 'submitting' || formStatus === 'success'}
                 />
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label htmlFor="phone" className="block text-sm font-medium">
@@ -105,12 +105,12 @@ const Contact = () => {
                   type="tel"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-kawasaki-green focus:border-transparent"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-bg-purple-600 focus:border-transparent"
                   placeholder="(123) 456-7890"
                   disabled={formStatus === 'submitting' || formStatus === 'success'}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <label htmlFor="interest" className="block text-sm font-medium">
                   I'm Interested In
@@ -120,7 +120,7 @@ const Contact = () => {
                   name="interest"
                   value={formData.interest}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-kawasaki-green focus:border-transparent"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-bg-purple-600 focus:border-transparent"
                   disabled={formStatus === 'submitting' || formStatus === 'success'}
                 >
                   <option value="test-ride">Test Ride</option>
@@ -130,7 +130,7 @@ const Contact = () => {
                 </select>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="message" className="block text-sm font-medium">
                 Message
@@ -141,20 +141,20 @@ const Contact = () => {
                 rows={4}
                 value={formData.message}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-kawasaki-green focus:border-transparent resize-none"
+                className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-bg-purple-600 focus:border-transparent resize-none"
                 placeholder="Tell us more about your inquiry..."
                 disabled={formStatus === 'submitting' || formStatus === 'success'}
               ></textarea>
             </div>
-            
+
             <button
               type="submit"
               disabled={formStatus === 'submitting' || formStatus === 'success'}
               className={cn(
                 "w-full py-3 rounded-full font-medium transition-all duration-300",
-                formStatus === 'success' 
-                  ? "bg-green-500 text-white" 
-                  : "bg-kawasaki-green text-white hover:bg-kawasaki-green/90",
+                formStatus === 'success'
+                  ? "bg-purple-600 text-white"
+                  : "bg-purple-600 text-white hover:bg-purple-600",
                 formStatus === 'submitting' && "opacity-70 cursor-not-allowed"
               )}
             >
@@ -165,13 +165,13 @@ const Contact = () => {
             </button>
           </form>
         </div>
-        
+
         {/* Info Side */}
         <div className="space-y-10">
           {/* Dealership Information */}
           <div className="space-y-6">
             <h3 className="text-2xl font-semibold">Visit Our Dealership</h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="glass-panel p-6 flex flex-col">
                 <h4 className="font-medium mb-2 text-lg">Opening Hours</h4>
@@ -181,7 +181,7 @@ const Contact = () => {
                   <p>Sunday: Closed</p>
                 </div>
               </div>
-              
+
               <div className="glass-panel p-6 flex flex-col">
                 <h4 className="font-medium mb-2 text-lg">Contact Info</h4>
                 <div className="space-y-1 text-muted-foreground flex-grow">
@@ -191,16 +191,16 @@ const Contact = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="glass-panel p-6">
               <h4 className="font-medium mb-2 text-lg">Address</h4>
               <p className="text-muted-foreground">123 Motorcycle Boulevard<br />Speedway, CA 90210<br />United States</p>
-              
-              <a 
-                href="https://maps.google.com" 
-                target="_blank" 
+
+              <a
+                href="https://maps.google.com"
+                target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center text-kawasaki-green mt-4 hover:underline"
+                className="inline-flex items-center text-bg-purple-600 mt-4 hover:underline"
               >
                 <span>View on map</span>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -210,9 +210,9 @@ const Contact = () => {
               </a>
             </div>
           </div>
-          
+
           {/* Call to Action */}
-          <div className="bg-kawasaki-green text-white p-8 rounded-xl">
+          <div className="bg-purple-600 text-white p-8 rounded-xl">
             <h3 className="text-2xl font-semibold mb-4">Ready for an Adrenaline Rush?</h3>
             <p className="mb-6">Experience the thrill of the Kawasaki Ninja with a test ride. Our team is ready to get you on the road.</p>
             <div className="flex items-center">

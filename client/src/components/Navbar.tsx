@@ -9,22 +9,22 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { Menu, X, ChevronDown, Bike, ShoppingCart, User, Search } from 'lucide-react';
+import { Menu, X, ChevronDown, Bike, Search, ShoppingCart, GitCompare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { brands } from '@/data/motorcycles';
 import { useBrand } from '@/contexts/BrandContext';
 import SearchSuggestions from './SearchSuggestions';
+import AuthButtons from './AuthButtons';
+import { useComparison } from '@/contexts/ComparisonContext';
+import { useCart } from '@/contexts/CartContext';
+import logo from '../assests/logo.png';
 
 const searchSuggestions = [
-  "Helmets...",
-  "Racing Suits...",
-  "Gloves...",
-  "Footwear...",
-  "Protection...",
-  "Electronics...",
-  "Jackets...",
-  "Pants..."
+  "Search motorcycles...",
+  "Search parts...",
+  "Search gear...",
+  "Search brands..."
 ];
 
 const Navbar = () => {
@@ -33,7 +33,9 @@ const Navbar = () => {
   const [showSearch, setShowSearch] = useState(false);
   const location = useLocation();
   const { currentBrand } = useBrand();
-  
+  const { items: comparisonItems } = useComparison();
+  const { itemCount } = useCart();
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -46,7 +48,7 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  
+
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
@@ -54,65 +56,60 @@ const Navbar = () => {
   const primaryColor = "#9b87f5"; // Purple theme
 
   return (
-    <header 
-      className={`fixed w-full top-0 left-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'
-      }`}
-      style={currentBrand ? { 
+    <header
+      className={`fixed w-full top-0 left-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'
+        }`}
+      style={currentBrand ? {
         backgroundColor: scrolled ? '#ffffff' : 'transparent',
         borderBottom: scrolled ? `1px solid ${currentBrand.primaryColor}20` : 'none'
       } : {}}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center">
-          <Bike 
-            className="h-8 w-8 mr-2" 
-            style={{ color: currentBrand ? currentBrand.primaryColor : primaryColor }}
-          />
-          <span className="text-xl font-bold">Rocket Riders</span>
+          <img src={logo} alt="logo" className="h-8 w-8 mr-2" style={{ color: currentBrand ? currentBrand.primaryColor : primaryColor }} />
+          <span className="text-xl font-bold" style={{ color: primaryColor }}>Adrenaline Bikes</span>
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
-          <Link 
-            to="/" 
-            className={`font-medium ${location.pathname === '/' ? 'text-primary' : 'hover:text-primary'}`}
-            style={currentBrand ? 
-              (location.pathname === '/' ? { color: currentBrand.primaryColor } : {}) : 
+          <Link
+            to="/"
+            className={`font-medium ${location.pathname === '/' ? 'text-primary' : 'hover:text-purple-600'}`}
+            style={currentBrand ?
+              (location.pathname === '/' ? { color: currentBrand.primaryColor } : {}) :
               (location.pathname === '/' ? { color: primaryColor } : {})
             }
           >
             Home
           </Link>
-          
-          <Link 
-            to="/gear" 
-            className={`font-medium ${location.pathname === '/gear' ? 'text-primary' : 'hover:text-primary'}`}
-            style={currentBrand ? 
-              (location.pathname === '/gear' ? { color: currentBrand.primaryColor } : {}) : 
+
+          <Link
+            to="/gear"
+            className={`font-medium ${location.pathname === '/gear' ? 'text-primary' : 'hover:text-purple-600'}`}
+            style={currentBrand ?
+              (location.pathname === '/gear' ? { color: currentBrand.primaryColor } : {}) :
               (location.pathname === '/gear' ? { color: primaryColor } : {})
             }
           >
             Gear
           </Link>
-          
-          <Link 
-            to="/parts" 
-            className={`font-medium ${location.pathname === '/parts' ? 'text-primary' : 'hover:text-primary'}`}
-            style={currentBrand ? 
-              (location.pathname === '/parts' ? { color: currentBrand.primaryColor } : {}) : 
+
+          <Link
+            to="/parts"
+            className={`font-medium ${location.pathname === '/parts' ? 'text-primary' : 'hover:text-purple-600'}`}
+            style={currentBrand ?
+              (location.pathname === '/parts' ? { color: currentBrand.primaryColor } : {}) :
               (location.pathname === '/parts' ? { color: primaryColor } : {})
             }
           >
             Parts
           </Link>
-          
+
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuTrigger 
-                  style={currentBrand ? 
-                    { color: location.pathname.includes('/brands') ? currentBrand.primaryColor : 'inherit' } : 
+                <NavigationMenuTrigger
+                  style={currentBrand ?
+                    { color: location.pathname.includes('/brands') ? currentBrand.primaryColor : 'inherit' } :
                     { color: location.pathname.includes('/brands') ? primaryColor : 'inherit' }
                   }
                 >
@@ -140,19 +137,18 @@ const Navbar = () => {
         </nav>
 
         <div className="hidden md:flex items-center space-x-3">
-          {/* Search bar */}
-          <div className="relative">
+          {/* <div className="relative">
             {showSearch ? (
-              <div className="flex items-center bg-white rounded-full border border-gray-200 pl-3 overflow-hidden transition-all duration-300">
-                <Search className="h-4 w-4 text-gray-400" />
+              <div className="flex items-center bg-white rounded-full border border-purple-200 pl-3 overflow-hidden transition-all duration-300">
+                <Search className="h-4 w-4 text-purple-400" /> 
                 <Input 
                   type="text" 
-                  placeholder="Search for" 
-                  className="border-none focus-visible:ring-0 w-[200px]"
+                  placeholder="Search motorcycles, parts, gear..." 
+                  className="border-none focus-visible:ring-0 w-[300px]"
                 />
                 <SearchSuggestions 
                   suggestions={searchSuggestions} 
-                  className="absolute left-[90px] top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute left-[120px] top-1/2 -translate-y-1/2 text-gray-400"
                 />
                 <Button 
                   variant="ghost" 
@@ -173,33 +169,35 @@ const Navbar = () => {
                 <Search className="h-5 w-5" />
               </Button>
             )}
-          </div>
-          
-          <Button 
-            variant="ghost"
-            size="icon"
-            aria-label="Shopping cart"
-          >
-            <ShoppingCart className="h-5 w-5" />
-          </Button>
-          
-          <Button 
-            style={currentBrand ? { 
-              backgroundColor: currentBrand.primaryColor,
-              color: '#ffffff'
-            } : {
-              backgroundColor: primaryColor,
-              color: '#ffffff'
-            }}
-          >
-            <User className="h-4 w-4 mr-2" />
-            Account
-          </Button>
+          </div> */}
+
+          <Link to="/compare" className="relative">
+            <Button variant="ghost" size="icon" aria-label="Compare">
+              <GitCompare className="h-5 w-5" />
+              {comparisonItems.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {comparisonItems.length}
+                </span>
+              )}
+            </Button>
+          </Link>
+
+          <Link to="/cart">
+            <Button variant="ghost" size="icon" aria-label="Cart">
+              <ShoppingCart className="h-5 w-5" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
+            </Button>
+          </Link>
+
+          <AuthButtons />
         </div>
 
-        {/* Mobile menu button */}
-        <button 
-          className="md:hidden focus:outline-none" 
+        <button
+          className="md:hidden focus:outline-none"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle menu"
         >
@@ -211,51 +209,49 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Navigation */}
       {isOpen && (
         <nav className="md:hidden bg-white border-t">
           <div className="px-6 py-4 space-y-4">
-            {/* Mobile Search */}
             <div className="relative flex items-center bg-gray-100 rounded-lg pl-3 overflow-hidden">
-              <Search className="h-4 w-4 text-gray-500" />
-              <Input 
-                type="text" 
-                placeholder="Search for" 
+              <Search className="h-4 w-4 text-purple-500" />
+              <Input
+                type="text"
+                placeholder="Search motorcycles, parts, gear..."
                 className="border-none bg-transparent focus-visible:ring-0"
               />
-              <SearchSuggestions 
-                suggestions={searchSuggestions} 
-                className="absolute left-[90px] top-1/2 -translate-y-1/2 text-gray-500"
+              <SearchSuggestions
+                suggestions={searchSuggestions}
+                className="absolute left-[120px] top-1/2 -translate-y-1/2 text-gray-500"
               />
             </div>
-            
-            <Link 
-              to="/" 
+
+            <Link
+              to="/"
               className="block font-medium py-2"
-              style={currentBrand && location.pathname === '/' ? { color: currentBrand.primaryColor } : 
+              style={currentBrand && location.pathname === '/' ? { color: currentBrand.primaryColor } :
                 location.pathname === '/' ? { color: primaryColor } : {}}
             >
               Home
             </Link>
-            
-            <Link 
-              to="/gear" 
+
+            <Link
+              to="/gear"
               className="block font-medium py-2"
-              style={currentBrand && location.pathname === '/gear' ? { color: currentBrand.primaryColor } : 
+              style={currentBrand && location.pathname === '/gear' ? { color: currentBrand.primaryColor } :
                 location.pathname === '/gear' ? { color: primaryColor } : {}}
             >
               Gear
             </Link>
-            
-            <Link 
-              to="/parts" 
+
+            <Link
+              to="/parts"
               className="block font-medium py-2"
-              style={currentBrand && location.pathname === '/parts' ? { color: currentBrand.primaryColor } : 
+              style={currentBrand && location.pathname === '/parts' ? { color: currentBrand.primaryColor } :
                 location.pathname === '/parts' ? { color: primaryColor } : {}}
             >
               Parts
             </Link>
-            
+
             <div className="py-2">
               <div className="flex items-center justify-between font-medium mb-2">
                 <span>Brands</span>
@@ -268,7 +264,7 @@ const Navbar = () => {
                     to={`/brands/${brand.id}`}
                     className="flex items-center py-1"
                   >
-                    <div 
+                    <div
                       className="w-3 h-3 mr-2 rounded-full"
                       style={{ backgroundColor: brand.primaryColor }}
                     ></div>
@@ -277,20 +273,19 @@ const Navbar = () => {
                 ))}
               </div>
             </div>
-            
-            <Button 
-              className="w-full justify-center mt-2"
-              style={currentBrand ? { 
-                backgroundColor: currentBrand.primaryColor,
-                color: '#ffffff'
-              } : {
-                backgroundColor: primaryColor,
-                color: '#ffffff'
-              }}
-            >
-              <User className="h-4 w-4 mr-2" />
-              Account
-            </Button>
+
+            <div className="flex space-x-3 mb-2">
+              <Link to="/compare" className="flex items-center gap-1 text-sm">
+                <GitCompare className="h-5 w-5" />
+                Compare ({comparisonItems.length})
+              </Link>
+              <Link to="/cart" className="flex items-center gap-1 text-sm">
+                <ShoppingCart className="h-5 w-5" />
+                Cart ({itemCount})
+              </Link>
+            </div>
+
+            <AuthButtons />
           </div>
         </nav>
       )}

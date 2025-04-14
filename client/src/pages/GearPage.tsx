@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Filter, ShoppingCart, Search, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +15,8 @@ import { useBrand } from '@/contexts/BrandContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SearchSuggestions from '@/components/SearchSuggestions';
+import { useCart } from '@/contexts/CartContext';
+import { toast } from '@/hooks/use-toast';
 
 type GearItem = {
   id: number;
@@ -131,45 +134,67 @@ const gearItems: GearItem[] = [
 const categories = [
   "All Categories",
   "Helmets",
-  "Racing Suits",
   "Gloves",
-  "Footwear",
-  "Protection",
-  "Electronics",
   "Jackets",
-  "Pants"
+  "Pants",
+  "Footwear",
+  "Racing Suits",
+  "Protection",
+  "Electronics"
 ];
 
 // Price ranges for filtering
 const priceRanges = [
   { label: "All Prices", min: 0, max: Infinity },
-  { label: "Under $100", min: 0, max: 100 },
-  { label: "$100 - $250", min: 100, max: 250 },
-  { label: "$250 - $500", min: 250, max: 500 },
-  { label: "Over $500", min: 500, max: Infinity }
+  { label: "Under ₹5,000", min: 0, max: 5000 },
+  { label: "₹5,000 - ₹10,000", min: 5000, max: 10000 },
+  { label: "₹10,000 - ₹15,000", min: 10000, max: 15000 },
+  { label: "₹15,000 - ₹20,000", min: 15000, max: 20000 },
+  { label: "₹20,000 - ₹25,000", min: 20000, max: 25000 },
+  { label: "₹25,000 - ₹30,000", min: 25000, max: 30000 },
+  { label: "₹30,000 - ₹35,000", min: 30000, max: 35000 },
+  { label: "₹35,000 - ₹40,000", min: 35000, max: 40000 },
+  { label: "Over ₹40,000", min: 40000, max: Infinity }
 ];
 
 const searchSuggestions = [
-  "Helmets...",
-  "Racing Suits...",
-  "Gloves...",
-  "Footwear...",
-  "Protection...",
-  "Electronics...",
-  "Jackets...",
-  "Pants..."
+  "Search for gear...",
+  "Search for Helmets...",
+  "Search for Racing Suits...",
+  "Search for Gloves...",
+  "Search for Footwear...",
+  "Search for Protection...",
+  "Search for Electronics...",
+  "Search for Jackets...",
+  "Search for Pants..."
 ];
 
 const GearPage = () => {
   const { currentBrand } = useBrand();
+  const { addItem } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedPriceRange, setSelectedPriceRange] = useState("All Prices");
   const [filteredGear, setFilteredGear] = useState<GearItem[]>(gearItems);
   const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
+  const [dynamicPlaceholder, setDynamicPlaceholder] = useState(searchSuggestions[0]);
   
-  const primaryColor = currentBrand ? currentBrand.primaryColor : "#9b87f5";
-  const lightPrimaryColor = `${primaryColor}15`;
+  const primaryColor = "#9b87f5"; // Purple theme
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      i = (i + 1) % searchSuggestions.length;
+      setDynamicPlaceholder(searchSuggestions[i]);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Convert $ to ₹ (approximately 75x)
+  const convertToRupees = (price: string): string => {
+    const numericValue = parseFloat(price.replace(/[^0-9.]/g, ''));
+    return `₹${Math.round(numericValue * 75).toLocaleString('en-IN')}`;
+  };
 
   // Apply filters when dependencies change
   useEffect(() => {
@@ -200,47 +225,58 @@ const GearPage = () => {
     setFilteredGear(filtered);
   }, [searchQuery, selectedCategory, selectedPriceRange]);
 
+  const handleAddToCart = (item: GearItem) => {
+    addItem({
+      id: item.id.toString(),
+      name: item.name,
+      price: item.numericPrice,
+      image: item.image,
+      type: 'gear'
+    });
+    toast({
+      title: "Added to cart",
+      description: `${item.name} has been added to your cart.`,
+    });
+  };
+
   return (
     <div className="min-h-screen overflow-x-hidden">
       <Navbar />
       
       <div className="pt-24 pb-20">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">Motorcycle Gear & Apparel</h1>
-            <p className="text-muted-foreground">
+          <div className="text-center mb-12 bg-gradient-to-r from-purple-50 to-purple-100 py-12 px-4 rounded-xl">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-purple-800">Motorcycle Gear & Apparel</h1>
+            <p className="text-purple-600 max-w-2xl mx-auto">
               Discover our premium selection of motorcycle gear designed for comfort, protection, and style.
             </p>
           </div>
           
           {/* Search and Filters */}
-          <div className="bg-gray-50 rounded-xl p-6 mb-12">
+          <div className="bg-white rounded-xl p-6 shadow-sm mb-12 border border-purple-100">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Search */}
-              <div>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input
-                    placeholder="Search for"
-                    className="pl-10"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => setShowSearchSuggestions(true)}
-                    onBlur={() => setTimeout(() => setShowSearchSuggestions(false), 200)}
+              {/* <div className="relative"> */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400 h-4 w-4" />
+                <Input
+                  placeholder={dynamicPlaceholder}
+                  className="pl-10 border-purple-200 focus:border-purple-300"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {showSearchSuggestions && searchQuery === "" && (
+                  <SearchSuggestions
+                    suggestions={searchSuggestions}
+                    className="absolute left-[120px] top-1/2 -translate-y-1/2 text-purple-400"
                   />
-                  {showSearchSuggestions && searchQuery === "" && (
-                    <SearchSuggestions 
-                      suggestions={searchSuggestions} 
-                      className="absolute left-[120px] top-1/2 -translate-y-1/2 text-gray-400"
-                    />
-                  )}
-                </div>
+                )}
               </div>
               
               {/* Category Filter */}
               <div>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
+                  <SelectTrigger className="border-purple-200">
                     <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -256,7 +292,7 @@ const GearPage = () => {
               {/* Price Range Filter */}
               <div>
                 <Select value={selectedPriceRange} onValueChange={setSelectedPriceRange}>
-                  <SelectTrigger>
+                  <SelectTrigger className="border-purple-200">
                     <SelectValue placeholder="Select Price Range" />
                   </SelectTrigger>
                   <SelectContent>
@@ -278,11 +314,14 @@ const GearPage = () => {
               <p className="text-muted-foreground mb-4">
                 Try changing your filters or search query
               </p>
-              <Button onClick={() => {
-                setSearchQuery("");
-                setSelectedCategory("All Categories");
-                setSelectedPriceRange("All Prices");
-              }}>
+              <Button 
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("All Categories");
+                  setSelectedPriceRange("All Prices");
+                }}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
                 Reset Filters
               </Button>
             </div>
@@ -291,43 +330,44 @@ const GearPage = () => {
           {/* Gear Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {filteredGear.map(item => (
-              <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                <div className="h-48 overflow-hidden relative">
+              <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow h-full flex flex-col">
+                <Link to={`/gear/${item.id}`} className="h-48 overflow-hidden relative block">
                   <img 
                     src={item.image} 
                     alt={item.name} 
                     className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
                   />
                   <div 
-                    className="absolute top-3 left-3 text-white px-2 py-1 text-xs rounded-full" 
-                    style={{ backgroundColor: primaryColor }}
+                    className="absolute top-3 left-3 text-white px-2 py-1 text-xs rounded-full bg-purple-600" 
                   >
                     {item.category}
                   </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-lg">{item.name}</h3>
-                    <span className="font-bold" style={{ color: primaryColor }}>{item.price}</span>
-                  </div>
+                </Link>
+                <div className="p-6 flex-1 flex flex-col">
+                  <Link to={`/gear/${item.id}`} className="block">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-bold text-lg">{item.name}</h3>
+                      <span className="font-bold text-purple-600">{convertToRupees(item.price)}</span>
+                    </div>
+                  </Link>
                   <div className="flex items-center mb-2">
                     <div className="flex text-yellow-400">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 fill-current" />
+                        <Star key={i} className={`h-4 w-4 ${i < Math.floor(item.rating) ? 'fill-current' : ''}`} />
                       ))}
                     </div>
                     <span className="text-xs text-muted-foreground ml-1">{item.rating}/5</span>
                   </div>
-                  <p className="text-muted-foreground text-sm mb-2">{item.description}</p>
-                  <div className="flex justify-between items-center mb-4">
+                  <p className="text-muted-foreground text-sm mb-2 line-clamp-2">{item.description}</p>
+                  <div className="flex justify-between items-center mb-4 mt-auto">
                     <span className="text-xs text-muted-foreground">{item.brand}</span>
                     <span className={`text-xs px-2 py-1 rounded-full ${item.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                       {item.inStock ? 'In Stock' : 'Out of Stock'}
                     </span>
                   </div>
                   <Button 
-                    className="w-full flex items-center justify-center gap-2 text-white"
-                    style={{ backgroundColor: primaryColor }}
+                    className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white"
+                    onClick={() => handleAddToCart(item)}
                     disabled={!item.inStock}
                   >
                     <ShoppingCart className="h-4 w-4" />
@@ -339,22 +379,22 @@ const GearPage = () => {
           </div>
           
           {/* Safety Information */}
-          <div className="mt-16 bg-white p-8 rounded-xl shadow-sm border-t-4" style={{ borderTopColor: primaryColor }}>
+          <div className="mt-16 bg-white p-8 rounded-xl shadow-sm border-t-4 border-purple-600">
             <h2 className="text-2xl font-bold mb-4">Gear Safety Information</h2>
             <p className="mb-4 text-muted-foreground">
               Proper motorcycle gear is essential for your safety on the road. All protective gear sold on our website meets or exceeds safety standards.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
               <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                <h3 className="font-bold mb-2" style={{ color: primaryColor }}>Helmet Standards</h3>
+                <h3 className="font-bold mb-2 text-purple-600">Helmet Standards</h3>
                 <p className="text-sm text-muted-foreground">Our helmets meet DOT, ECE 22.05, and Snell certifications, ensuring maximum protection in case of impact.</p>
               </div>
               <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                <h3 className="font-bold mb-2" style={{ color: primaryColor }}>Protective Clothing</h3>
+                <h3 className="font-bold mb-2 text-purple-600">Protective Clothing</h3>
                 <p className="text-sm text-muted-foreground">All jackets and pants feature CE-rated armor at impact zones and abrasion-resistant materials.</p>
               </div>
               <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                <h3 className="font-bold mb-2" style={{ color: primaryColor }}>Size Guide</h3>
+                <h3 className="font-bold mb-2 text-purple-600">Size Guide</h3>
                 <p className="text-sm text-muted-foreground">Properly sized gear is crucial for comfort and protection. Check our detailed size guide before purchase.</p>
               </div>
             </div>

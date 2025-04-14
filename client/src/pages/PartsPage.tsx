@@ -17,6 +17,8 @@ import { brands } from '@/data/motorcycles';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SearchSuggestions from '@/components/SearchSuggestions';
+import { useCart } from '@/contexts/CartContext';
+import { toast } from '@/hooks/use-toast';
 
 type Part = {
   id: string;
@@ -145,26 +147,39 @@ const categories = [
 ];
 
 const searchSuggestions = [
-  "Helmets...",
-  "Racing Suits...",
-  "Gloves...",
-  "Footwear...",
-  "Protection...",
-  "Electronics...",
-  "Jackets...",
-  "Pants..."
+  "Search for Parts...",
+  "Search for Air Intake...",
+  "Search for Exhaust...",
+  "Search for Drive train...",
+  "Search for Brakes...",
+  "Search for Suspension...",
+  "Search for Electrical...",
+  "Search for Body...",
+  "Search for Electronics..."
 ];
 
 const PartsPage = () => {
   const { currentBrand, setCurrentBrand } = useBrand();
+  const { addItem } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [filteredParts, setFilteredParts] = useState<Part[]>(bikeParts);
   const [selectedBrand, setSelectedBrand] = useState<string>(currentBrand?.id || "all-brands");
+  // const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
   const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
+  const [dynamicPlaceholder, setDynamicPlaceholder] = useState(searchSuggestions[0]);
 
-  const primaryColor = currentBrand ? currentBrand.primaryColor : "#9b87f5";
+  const primaryColor = "#9b87f5"; // Purple theme
   const lightPrimaryColor = `${primaryColor}15`;
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      i = (i + 1) % searchSuggestions.length;
+      setDynamicPlaceholder(searchSuggestions[i]);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Apply filters when dependencies change
   useEffect(() => {
@@ -172,7 +187,7 @@ const PartsPage = () => {
 
     // Filter by search query
     if (searchQuery) {
-      filtered = filtered.filter(part => 
+      filtered = filtered.filter(part =>
         part.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         part.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -208,47 +223,59 @@ const PartsPage = () => {
     }
   }, [currentBrand]);
 
+  const handleAddToCart = (part: Part) => {
+    addItem({
+      id: part.id,
+      name: part.name,
+      price: part.price,
+      image: part.image,
+      type: 'part'
+    });
+    toast({
+      title: "Added to cart",
+      description: `${part.name} has been added to your cart.`,
+    });
+  };
+
   return (
     <div className="min-h-screen overflow-x-hidden">
       <Navbar />
-      
+
       <div className="pt-24 pb-20">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">Motorcycle Parts & Accessories</h1>
-            <p className="text-muted-foreground">
+          <div className="text-center mb-12 bg-gradient-to-r from-purple-50 to-purple-100 py-12 px-4 rounded-xl">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-purple-800">Motorcycle Parts & Accessories</h1>
+            <p className="text-purple-600 max-w-2xl mx-auto">
               Find premium quality parts for your motorcycle to enhance performance, style, and functionality.
             </p>
           </div>
-          
+
           {/* Search and Filter Section */}
-          <div className="bg-gray-50 rounded-xl p-6 mb-12">
+          <div className="bg-white rounded-xl p-6 shadow-sm mb-12 border border-purple-100">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {/* Search */}
-              <div className="col-span-1 md:col-span-2">
+              <div className="col-span-1 md:col-span-2 relative">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400 h-4 w-4" />
                   <Input
-                    placeholder="Search for"
-                    className="pl-10"
+                    placeholder={dynamicPlaceholder}
+                    className="pl-10 border-purple-200 focus:border-purple-300"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => setShowSearchSuggestions(true)}
-                    onBlur={() => setTimeout(() => setShowSearchSuggestions(false), 200)}
                   />
                   {showSearchSuggestions && searchQuery === "" && (
-                    <SearchSuggestions 
-                      suggestions={searchSuggestions} 
-                      className="absolute left-[120px] top-1/2 -translate-y-1/2 text-gray-400"
+                    <SearchSuggestions
+                      suggestions={searchSuggestions}
+                      className="absolute left-[120px] top-1/2 -translate-y-1/2 text-purple-400"
                     />
                   )}
                 </div>
               </div>
-              
+
               {/* Brand Filter */}
               <div>
                 <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-                  <SelectTrigger>
+                  <SelectTrigger className="border-purple-200">
                     <SelectValue placeholder="Select Brand" />
                   </SelectTrigger>
                   <SelectContent>
@@ -261,11 +288,11 @@ const PartsPage = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               {/* Category Filter */}
               <div>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
+                  <SelectTrigger className="border-purple-200">
                     <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -279,7 +306,7 @@ const PartsPage = () => {
               </div>
             </div>
           </div>
-          
+
           {/* No parts message */}
           {filteredParts.length === 0 && (
             <div className="text-center py-12 border rounded-lg">
@@ -287,56 +314,61 @@ const PartsPage = () => {
               <p className="text-muted-foreground mb-4">
                 Try changing your filters or search query
               </p>
-              <Button onClick={() => {
-                setSearchQuery("");
-                setSelectedCategory("All Categories");
-                setSelectedBrand("all-brands");
-              }}>
+              <Button
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("All Categories");
+                  setSelectedBrand("all-brands");
+                }}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
                 Reset Filters
               </Button>
             </div>
           )}
-          
+
           {/* Parts Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredParts.map(part => (
-              <div key={part.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-                <div className="h-48 overflow-hidden">
-                  <img 
-                    src={part.image} 
-                    alt={part.name} 
-                    className="w-full h-full object-cover"
+              <div key={part.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden h-full flex flex-col">
+                <Link to={`/part/${part.id}`} className="h-48 overflow-hidden block">
+                  <img
+                    src={part.image}
+                    alt={part.name}
+                    className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
                   />
-                </div>
-                <div className="p-5">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold">{part.name}</h3>
-                    <span className="font-bold" style={{ color: primaryColor }}>${part.price}</span>
-                  </div>
+                </Link>
+                <div className="p-5 flex-grow flex flex-col">
+                  <Link to={`/part/${part.id}`} className="block">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-bold">{part.name}</h3>
+                      <span className="font-bold text-purple-600"> ₹{part.price}</span>
+                    </div>
+                  </Link>
                   <div className="flex items-center mb-2">
                     <div className="flex">
                       {[...Array(5)].map((_, i) => (
-                        <svg key={i} className="w-4 h-4 fill-current text-yellow-400" viewBox="0 0 20 20">
+                        <svg key={i} className={`w-4 h-4 fill-current ${i < Math.floor(part.rating) ? 'text-yellow-400' : 'text-gray-300'}`} viewBox="0 0 20 20">
                           <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
                         </svg>
                       ))}
                     </div>
                     <span className="text-xs text-muted-foreground ml-1">{part.rating}/5</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-3 truncate">
+                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                     {part.description}
                   </p>
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
+                  <div className="flex justify-between items-center mb-3 mt-auto">
+                    <span className="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-full">
                       {part.category}
                     </span>
                     <span className={`text-xs px-2 py-1 rounded-full ${part.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                       {part.inStock ? 'In Stock' : 'Out of Stock'}
                     </span>
                   </div>
-                  <Button 
-                    className="w-full flex items-center justify-center gap-2"
-                    style={{ backgroundColor: primaryColor }}
+                  <Button
+                    className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700"
+                    onClick={() => handleAddToCart(part)}
                     disabled={!part.inStock}
                   >
                     <ShoppingCart className="h-4 w-4" />
@@ -346,9 +378,9 @@ const PartsPage = () => {
               </div>
             ))}
           </div>
-          
+
           {/* Compatibility Notice */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mt-12 border-t-4" style={{ borderTopColor: primaryColor }}>
+          <div className="bg-white rounded-lg shadow-sm p-6 mt-12 border-t-4 border-purple-600">
             <h3 className="text-lg font-bold mb-2">Compatibility Guide</h3>
             <p className="text-muted-foreground mb-4">
               Please make sure to select the correct bike brand and model to ensure parts compatibility.
@@ -356,13 +388,12 @@ const PartsPage = () => {
             </p>
             <div className="flex flex-wrap gap-2 mt-2">
               {brands.map(brand => (
-                <Button 
+                <Button
                   key={brand.id}
                   variant="outline"
                   size="sm"
                   onClick={() => setSelectedBrand(brand.id)}
-                  className={selectedBrand === brand.id ? 'border-2' : ''}
-                  style={selectedBrand === brand.id ? { borderColor: brand.primaryColor, color: brand.primaryColor } : {}}
+                  className={selectedBrand === brand.id ? 'border-2 text-purple-600 border-purple-600' : ''}
                 >
                   {brand.name}
                 </Button>
@@ -371,7 +402,7 @@ const PartsPage = () => {
           </div>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );

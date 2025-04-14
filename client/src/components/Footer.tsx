@@ -2,20 +2,22 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { brands } from '@/data/motorcycles';
+import logo from '../assests/logo.png'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  
+
   return (
     <footer className="bg-[#2a2438] text-white pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Main Footer */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-8">
           {/* Brand Column */}
           <div className="md:col-span-1">
-            <div className="mb-6">
-              <span className="text-2xl font-display font-bold text-white">
-                ROCKET RIDERS
+            <div className="flex  mb-6">
+              <img src={logo} alt="" className='h-10 w-100 m-2' />
+              <span className="text-2xl font-display font-bold text-white mt-4">
+                Adrenaline Bikes
               </span>
             </div>
             <p className="text-gray-400 mb-6 max-w-xs">
@@ -44,15 +46,15 @@ const Footer = () => {
               </a>
             </div>
           </div>
-          
+
           {/* Links Columns */}
           <div>
             <h3 className="text-lg font-medium mb-6 text-[#9b87f5]">Brands</h3>
             <ul className="space-y-4">
               {brands.slice(0, 5).map((brand) => (
                 <li key={brand.id}>
-                  <Link 
-                    to={`/brands/${brand.id}`} 
+                  <Link
+                    to={`/brands/${brand.id}`}
                     className="text-gray-400 hover:text-[#9b87f5] transition-colors"
                   >
                     {brand.name}
@@ -60,8 +62,8 @@ const Footer = () => {
                 </li>
               ))}
               <li>
-                <Link 
-                  to="/brands" 
+                <Link
+                  to="/brands"
                   className="text-gray-400 hover:text-[#9b87f5] transition-colors"
                 >
                   View All Brands
@@ -69,7 +71,7 @@ const Footer = () => {
               </li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-medium mb-6 text-[#9b87f5]">Support</h3>
             <ul className="space-y-4">
@@ -80,7 +82,7 @@ const Footer = () => {
               <li><a href="#" className="text-gray-400 hover:text-[#9b87f5] transition-colors">Service Manuals</a></li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-medium mb-6 text-[#9b87f5]">Company</h3>
             <ul className="space-y-4">
@@ -92,33 +94,11 @@ const Footer = () => {
             </ul>
           </div>
         </div>
-        
-        {/* Newsletter */}
-        <div className="border-t border-gray-800 pt-10 pb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div>
-              <h3 className="text-lg font-medium mb-2">Subscribe to our newsletter</h3>
-              <p className="text-gray-400">Stay updated with the latest news and product releases.</p>
-            </div>
-            <div>
-              <div className="flex">
-                <input 
-                  type="email" 
-                  placeholder="Enter your email" 
-                  className="bg-gray-800 text-white px-4 py-3 rounded-l-lg focus:outline-none flex-grow"
-                />
-                <button className="bg-[#9b87f5] text-white px-6 py-3 rounded-r-lg font-medium hover:bg-[#8a76e4] transition-colors">
-                  Subscribe
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        
+
         {/* Bottom Footer */}
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="text-gray-500 text-sm mb-4 md:mb-0">
-            © {currentYear} Rocket Riders. All rights reserved.
+            © {currentYear} Adrenaline Bikes. All rights reserved.
           </div>
           <div className="flex space-x-6">
             <a href="#" className="text-gray-500 hover:text-[#9b87f5] text-sm">Privacy Policy</a>
