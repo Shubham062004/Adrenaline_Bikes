@@ -1,3 +1,4 @@
+// GearPage.tsx
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -17,6 +18,7 @@ import Footer from '@/components/Footer';
 import SearchSuggestions from '@/components/SearchSuggestions';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from '@/hooks/use-toast';
+import { gearItems } from '../data/gear'; // Import the gear items
 
 type GearItem = {
   id: number;
@@ -31,103 +33,34 @@ type GearItem = {
   inStock: boolean;
 };
 
-const gearItems: GearItem[] = [
-  {
-    id: 1,
-    name: "Pro Racing Helmet",
-    price: "$599",
-    numericPrice: 599,
-    rating: 4.9,
-    description: "Aerodynamic racing helmet with advanced impact protection and ventilation.",
-    category: "Helmets",
-    image: "https://images.unsplash.com/photo-1583227122027-d2d360c66d3c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    brand: "Shoei",
-    inStock: true
-  },
-  {
-    id: 2,
-    name: "Premium Leather Suit",
-    price: "$1,499",
-    numericPrice: 1499,
-    rating: 4.8,
-    description: "Full body racing suit with CE-rated protection and stretch panels for comfort.",
-    category: "Racing Suits",
-    image: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    brand: "Alpinestars",
-    inStock: true
-  },
-  {
-    id: 3,
-    name: "Carbon Racing Gloves",
-    price: "$199",
-    numericPrice: 199,
-    rating: 4.7,
-    description: "Kangaroo leather racing gloves with carbon fiber protection and touchscreen compatibility.",
-    category: "Gloves",
-    image: "https://images.unsplash.com/photo-1603811413088-8f37698308f7?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    brand: "Dainese",
-    inStock: true
-  },
-  {
-    id: 4,
-    name: "Track Racing Boots",
-    price: "$349",
-    numericPrice: 349,
-    rating: 4.8,
-    description: "Professional racing boots with replaceable toe sliders and ankle protection.",
-    category: "Footwear",
-    image: "https://images.unsplash.com/photo-1581175909806-8083f87cf312?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    brand: "Sidi",
-    inStock: true
-  },
-  {
-    id: 5,
-    name: "CE-Certified Back Protector",
-    price: "$149",
-    numericPrice: 149,
-    rating: 4.9,
-    description: "Level 2 CE-certified back protector with multi-layer impact absorption technology.",
-    category: "Protection",
-    image: "https://images.unsplash.com/photo-1570437226579-5c1f6e48e2c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    brand: "REV'IT!",
-    inStock: true
-  },
-  {
-    id: 6,
-    name: "Bluetooth Communication System",
-    price: "$299",
-    numericPrice: 299,
-    rating: 4.7,
-    description: "Helmet intercom system with 4-way communication, smartphone connectivity, and FM radio.",
-    category: "Electronics",
-    image: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    brand: "Cardo",
-    inStock: false
-  },
-  {
-    id: 7,
-    name: "Waterproof Touring Jacket",
-    price: "$429",
-    numericPrice: 429,
-    rating: 4.6,
-    description: "All-season touring jacket with removable thermal liner and waterproof membrane.",
-    category: "Jackets",
-    image: "https://images.unsplash.com/photo-1551105204-3c8e3effb308?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    brand: "Klim",
-    inStock: true
-  },
-  {
-    id: 8,
-    name: "Kevlar Riding Jeans",
-    price: "$189",
-    numericPrice: 189,
-    rating: 4.5,
-    description: "Stylish jeans with Kevlar lining and removable CE armor for urban riding.",
-    category: "Pants",
-    image: "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    brand: "Rokker",
-    inStock: true
-  }
+// Calculate the price range
+const calculatePriceRange = (items: GearItem[]): { min: number; max: number } => {
+  let minPrice = Infinity;
+  let maxPrice = 0;
+
+  items.forEach(item => {
+    if (item.numericPrice < minPrice) {
+      minPrice = item.numericPrice;
+    }
+    if (item.numericPrice > maxPrice) {
+      maxPrice = item.numericPrice;
+    }
+  });
+
+  return { min: minPrice, max: maxPrice };
+};
+
+const { min, max } = calculatePriceRange(gearItems);
+
+// Price ranges for filtering
+const priceRanges = [
+  { label: "All Prices", min: 0, max: Infinity },
+  ...Array.from({ length: Math.ceil((max - min) / 5000) }, (_, i) => ({
+    label: `₹${(min + i * 5000).toLocaleString('en-IN')} - ₹${(min + (i + 1) * 5000).toLocaleString('en-IN')}`,
+    min: min + i * 5000,
+    max: min + (i + 1) * 5000
+  })),
+  { label: `Over ₹${max.toLocaleString('en-IN')}`, min: max, max: Infinity }
 ];
 
 // Categories for filtering
@@ -141,20 +74,6 @@ const categories = [
   "Racing Suits",
   "Protection",
   "Electronics"
-];
-
-// Price ranges for filtering
-const priceRanges = [
-  { label: "All Prices", min: 0, max: Infinity },
-  { label: "Under ₹5,000", min: 0, max: 5000 },
-  { label: "₹5,000 - ₹10,000", min: 5000, max: 10000 },
-  { label: "₹10,000 - ₹15,000", min: 10000, max: 15000 },
-  { label: "₹15,000 - ₹20,000", min: 15000, max: 20000 },
-  { label: "₹20,000 - ₹25,000", min: 20000, max: 25000 },
-  { label: "₹25,000 - ₹30,000", min: 25000, max: 30000 },
-  { label: "₹30,000 - ₹35,000", min: 30000, max: 35000 },
-  { label: "₹35,000 - ₹40,000", min: 35000, max: 40000 },
-  { label: "Over ₹40,000", min: 40000, max: Infinity }
 ];
 
 const searchSuggestions = [
@@ -256,7 +175,6 @@ const GearPage = () => {
           <div className="bg-white rounded-xl p-6 shadow-sm mb-12 border border-purple-100">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Search */}
-              {/* <div className="relative"> */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400 h-4 w-4" />
                 <Input
